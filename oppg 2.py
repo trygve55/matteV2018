@@ -17,3 +17,4 @@ def makeStructureMatrix( n ):
     return A
 
 print(makeStructureMatrix(10))
+

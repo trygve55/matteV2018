@@ -6,6 +6,7 @@ from scipy.sparse.linalg import spsolve
 import numpy as np
 from numpy import linalg
 import math
+import matplotlib.pyplot as pl
 
 g = -9.81 #gravity constant earth (negative)
 L = 2.0 #length
@@ -39,13 +40,11 @@ def getB(n):
 
 def getBextraWeight(n):
     h = L/n
-    b = sp.array([(h**4/(E*I))*f] * n)
+    b = getB(n)
 
     for x in range(n):
-        print(b[x])
-        b[x] -= h*p*g*math.sin((x*h + h/2)*math.pi/L)
-        print(h*p*g*math.sin((x*h + h/2)*math.pi/L))
-
+        b[x] -= ((h)**4 /(E * I)) * p*g*math.sin((x*h)*math.pi/L) #p*g*math.sin((x*h + h/2)*math.pi/L)
+        
     return b
 
 def getY(x):
@@ -65,7 +64,7 @@ def oppg5(i):
         b = getB(n)
         
         y = getY(L) - spsolve(A, b)[-1]
-        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "y" : y})
+        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "y" : y, "h" : L/n})
 
     return out
 
@@ -76,13 +75,9 @@ def oppg6b(i):
         n = 10 * 2**i
         
         A = makeStructureMatrix(n)
-        b = getB(n)
-        print(spsolve(A, b)[-1])
-        print(b)
-        #print(getBextraWeight(n))
-        print(getYextraWeight(L))
+        b = getBextraWeight(n)
         y = getYextraWeight(L) - spsolve(A, b)[-1]
-        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "y" : y})
+        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "y" : y, "h" : L/n})
 
     return out
 
@@ -90,8 +85,6 @@ def oppg6b(i):
 def kondisjonstall(A):
     return linalg.norm(A,np.inf)*linalg.norm(linalg.inv(A),np.inf);
 
-def sinusformethaug(x, h):
-    return -h * p * g * math.sin(((x + h/2)/L) * math.pi)
 
 n = 10
 A = makeStructureMatrix(n)
@@ -113,12 +106,63 @@ print("4. Derivert: ", np.matmul(A.toarray(), y_e)*(1000/(L**4))); # SPØRRE RIV
 n = m;
 
 print("Oppg. 5")
-for e in oppg5(6):
+oppg5data = oppg5(9)
+for e in oppg5data:
     print(e)
 
 print("Oppg. 6b")
-for e in oppg6b(3):
+oppg6data = oppg6b(9)
+for e in oppg6data:
     print(e)
+
+print("Oppg. 6c")
+arrayY5 = []
+arrayX5 = []
+for e in oppg5data:
+    arrayX5.append(e["h"])
+    arrayY5.append(e["y"])
+arrayY6 = []
+arrayX6 = []
+for e in oppg6data:
+    arrayX6.append(e["h"])
+    arrayY6.append(e["y"])
+
+pl.subplot(211)
+pl.yscale('log')
+pl.xscale('log')
+pl.xlabel("h")
+pl.ylabel("Feil")
+pl.plot(arrayX5, np.fabs(arrayY5))
+pl.subplot(212)
+pl.yscale('log')
+pl.xscale('log')
+pl.xlabel("h")
+pl.ylabel("Feil")
+pl.plot(arrayX6, np.fabs(arrayY6))
+pl.show()
+
+print("Oppg. 6d")
+for e in oppg5data:
+    arrayX5.append(e["h"]**2)
+    arrayY5.append(e["kondis"] * np.finfo(float).eps)
+arrayY6 = []
+arrayX6 = []
+for e in oppg6data:
+    arrayX6.append(e["h"])
+    arrayY6.append(e["y"])
+
+pl.subplot(211)
+pl.yscale('log')
+pl.xscale('log')
+pl.ylabel("kondisjon")
+pl.plot(arrayY5)
+pl.subplot(212)
+pl.yscale('log')
+pl.xscale('log')
+pl.xlabel("h")
+pl.ylabel("Feil")
+pl.plot(arrayX6, np.fabs(arrayY6))
+pl.show()
 
 print("Oppg. 7")
 

@@ -17,8 +17,9 @@ I = (w*d**3.0)/12.0 #inertia around the center of mass
 m = density*w*d #mass per meter of beam
 f = m*g #downward force per meter of beam
 p = 100.0 #kg/m
+constant = f/(24 * E * I);
 
-def makeStructureMatrix( n ):
+def makeStructureMatrix(n):
     e = sp.ones(n)
     A = spdiags([e, -4*e, 6*e,-4*e, e],[-2,-1,0,1,2],n,n)
     A = lil_matrix(A)
@@ -32,15 +33,13 @@ def makeStructureMatrix( n ):
     return csr_matrix(A)
 
 def getB(n):
-    h = L/n
 
-    b = sp.array([(h**4 /(E * I)) * f] * n)
+    b = sp.array([((L/n)**4 /(E * I)) * f] * n)
 
     return b
 
 def getBextraWeight(n):
     h = L/n
-
     b = sp.array([(h**4/(E*I))*f] * n)
 
     for x in range(n):
@@ -49,20 +48,20 @@ def getBextraWeight(n):
     return b
 
 def getY(x):
-    return (f/(24 * E * I))* x * x *(x * (x - 4 * L) + 6 * L * L)
+    return constant * x * x * (x * (x - 4 * L) + 6 * L * L)
 
 #def numDeriv4(n):
 #    h = L/n;
 #    return (getY(n - 2*h) - 4 * (getY(n - h) + getY(n + h)) + 6 * getY(n) + getY(n + 2*h))/h**4;
 
-def getYextraWeight(x):
-    return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2) #- ((g*p*l)/(E*I*math.pi))*((L**3/math.pi**3)*math.sin(math.pi*x/L) - x**3/6 + L*x**2/2) - L**2*x/math.pi**2)
+def getYextraWeight(x): # This the same as above??
+    return constant * x * x * (x * (x - 4 * L) + 6 * L * L) #- ((g*p*l)/(E*I*math.pi))*((L**3/math.pi**3)*math.sin(math.pi*x/L) - x**3/6 + L*x**2/2) - L**2*x/math.pi**2)
 
 def oppg5(i):
     out = []
     
     for i in range(i - 1):
-        n = 20 * 2**i
+        n = 20 << i;
         
         A = makeStructureMatrix(n)
         b = getB(n)
@@ -76,7 +75,7 @@ def oppg6b(i):
     out = []
     
     for i in range(i - 1):
-        n = 20 * 2**i
+        n = 20 << i;
         
         A = makeStructureMatrix(n)
         b = getBextraWeight(n)
@@ -90,11 +89,10 @@ def oppg6b(i):
 
 
 def kondisjonstall(A):
-    invers=linalg.inv(A)
-    return linalg.norm(A,np.inf)*linalg.norm(invers,np.inf)
+    return linalg.norm(A,np.inf)*linalg.norm(linalg.inv(A),np.inf);
 
 def sinusformethaug(x, h):
-    return -h*p*g*math.sin((x + h/2)*math.pi/L)
+    return -h * p * g * math.sin(((x + h/2)/L) * math.pi)
 
 n = 10
 A = makeStructureMatrix(n)
@@ -108,9 +106,12 @@ y = spsolve(A, b)
 print(y)
 
 print("Oppg. 4");
-y_e = sp.array([getY(i/10) for i in range(2, 21, 2)]);
+m = n;
+n = 10;
+y_e = sp.array([getY(i/n) for i in range(2, 21, 2)]);
 print("Y_e: ", y_e);
-print(csr_matrix.multiply(A, y_e)*(1000/((L)**4)));
+print("4. Derivert: ", np.matmul(A.toarray(), y_e)*(1000/(L**4))); # SPØRRE RIVTZ OM DETTE
+n = m;
 
 print("Oppg. 5")
 for e in oppg5(6):

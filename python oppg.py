@@ -18,6 +18,7 @@ m = density*w*d #mass per meter of beam
 f = m*g #downward force per meter of beam
 p = 100.0 #kg/m
 constant = f/(24 * E * I);
+emach = np.finfo(float).eps;#1/2**(52);
 
 def makeStructureMatrix(n):
     e = sp.ones(n)
@@ -59,7 +60,7 @@ def oppg5(i):
     out = []
 
     for i in range(i):
-        n = 10 * 2**i
+        n = 10 << i
         
         A = makeStructureMatrix(n)
         b = getB(n)
@@ -73,7 +74,7 @@ def oppg6b(i):
     out = []
     
     for i in range(i):
-        n = 10 * 2**i
+        n = 10 << i
         
         A = makeStructureMatrix(n)
         b = getB(n)
@@ -107,9 +108,24 @@ print(y)
 print("Oppg. 4");
 m = n;
 n = 10;
-y_e = sp.array([getY(i/n) for i in range(2, 21, 2)]);
-print("Y_e: ", y_e);
-print("4. Derivert: ", np.matmul(A.toarray(), y_e)*(1000/(L**4))); # SPØRRE RIVTZ OM DETTE
+y_e = np.array([getY(i/n) for i in range(2, 21, 2)]);
+print("4.c. y_e: ", y_e, "\n");
+A_y = np.matmul(A.toarray(), y_e)*(10000/(L**4));# SPØRRE RIVTZ OM DETTE
+print("4.c. Derivert: ", A_y, "\n");
+vector = np.array([f/(E * I)] * n);
+print("4.d. f/(EI): ", vector, "\n");
+print("4.d. Differanse: ", A_y - vector, "\n");
+forward = linalg.norm(vector - A_y, np.inf);
+print("4.d. Fram. feil: ", forward, "\n");
+rel = forward/linalg.norm(vector, np.inf);
+print("4.d. Rel. Fram. feil: ", rel, "\n");
+print("4.d. Feil forstørring: ", rel/emach);
+print("4.d. Kondisjonstall: ", kondisjonstall(A.toarray()));
+#Mangler å se på kondisjonstallet.
+
+# Tull med oppg e:
+#print("4.e. Differanse: ", y[-1] - getY(L), "\n");
+#print("4.e. Fram. feil: ", linalg.norm(y - getY(L), 1), "\n");
 n = m;
 
 print("Oppg. 5")

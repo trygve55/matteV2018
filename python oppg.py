@@ -34,7 +34,7 @@ def makeStructureMatrix( n ):
 def getB(n):
     h = L/n
 
-    b = sp.array([(h**4 /(E * I)) * f] * n)
+    b = sp.array([(h**4/(E*I))*f] * n)
 
     return b
 
@@ -44,25 +44,23 @@ def getBextraWeight(n):
     b = sp.array([(h**4/(E*I))*f] * n)
 
     for x in range(n):
-        b[x] += sinusformethaug(x*h, h)
+        print(b[x])
+        b[x] -= h*p*g*math.sin((x*h + h/2)*math.pi/L)
+        print(h*p*g*math.sin((x*h + h/2)*math.pi/L))
 
     return b
 
 def getY(x):
-    return (f/(24 * E * I))* x * x *(x * (x - 4 * L) + 6 * L * L)
-
-#def numDeriv4(n):
-#    h = L/n;
-#    return (getY(n - 2*h) - 4 * (getY(n - h) + getY(n + h)) + 6 * getY(n) + getY(n + 2*h))/h**4;
+    return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2)
 
 def getYextraWeight(x):
-    return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2) #- ((g*p*l)/(E*I*math.pi))*((L**3/math.pi**3)*math.sin(math.pi*x/L) - x**3/6 + L*x**2/2) - L**2*x/math.pi**2)
+    return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2) - ((g*p*L)/(E*I*math.pi))*((L**3/math.pi**3)*math.sin(math.pi*x/L) - x**3/6 + L*x**2/2 - L**2*x/math.pi**2)
 
 def oppg5(i):
     out = []
     
-    for i in range(i - 1):
-        n = 20 * 2**i
+    for i in range(i):
+        n = 10 * 2**i
         
         A = makeStructureMatrix(n)
         b = getB(n)
@@ -75,14 +73,15 @@ def oppg5(i):
 def oppg6b(i):
     out = []
     
-    for i in range(i - 1):
-        n = 20 * 2**i
+    for i in range(i):
+        n = 10 * 2**i
         
         A = makeStructureMatrix(n)
-        b = getBextraWeight(n)
+        b = getB(n)
         print(spsolve(A, b)[-1])
         print(b)
-        print(getYextraWeight(n))
+        #print(getBextraWeight(n))
+        print(getYextraWeight(L))
         y = getYextraWeight(L) - spsolve(A, b)[-1]
         out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "y" : y})
 
@@ -92,9 +91,6 @@ def oppg6b(i):
 def kondisjonstall(A):
     invers=linalg.inv(A)
     return linalg.norm(A,np.inf)*linalg.norm(invers,np.inf)
-
-def sinusformethaug(x, h):
-    return -h*p*g*math.sin((x + h/2)*math.pi/L)
 
 n = 10
 A = makeStructureMatrix(n)
@@ -107,17 +103,12 @@ print("Oppg. 3")
 y = spsolve(A, b)
 print(y)
 
-print("Oppg. 4");
-y_e = sp.array([getY(i/10) for i in range(2, 21, 2)]);
-print("Y_e: ", y_e);
-print(csr_matrix.multiply(A, y_e)*(1000/((L)**4)));
-
 print("Oppg. 5")
 for e in oppg5(6):
     print(e)
 
 print("Oppg. 6b")
-for e in oppg6b(6):
+for e in oppg6b(3):
     print(e)
 
 print("Oppg. 7")

@@ -34,7 +34,7 @@ def makeStructureMatrix( n ):
 def getB(n):
     h = L/n
 
-    b = sp.array([(h**4/(E*I))*f] * n)
+    b = sp.array([(h**4 /(E * I)) * f] * n)
 
     return b
 
@@ -49,7 +49,11 @@ def getBextraWeight(n):
     return b
 
 def getY(x):
-    return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2)
+    return (f/(24 * E * I))* x * x *(x * (x - 4 * L) + 6 * L * L)
+
+#def numDeriv4(n):
+#    h = L/n;
+#    return (getY(n - 2*h) - 4 * (getY(n - h) + getY(n + h)) + 6 * getY(n) + getY(n + 2*h))/h**4;
 
 def getYextraWeight(x):
     return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2) #- ((g*p*l)/(E*I*math.pi))*((L**3/math.pi**3)*math.sin(math.pi*x/L) - x**3/6 + L*x**2/2) - L**2*x/math.pi**2)
@@ -102,6 +106,11 @@ print(b)
 print("Oppg. 3") 
 y = spsolve(A, b)
 print(y)
+
+print("Oppg. 4");
+y_e = sp.array([getY(i/10) for i in range(2, 21, 2)]);
+print("Y_e: ", y_e);
+print(csr_matrix.multiply(A, y_e)*(1000/((L)**4)));
 
 print("Oppg. 5")
 for e in oppg5(6):

@@ -11,13 +11,15 @@ import matplotlib.pyplot as pl
 g = -9.81 #gravity constant earth (negative)
 L = 2.0 #length
 w = 0.30 #width
-d = 0.03 #depth
+d = 0.030 #depth
 density = 480.0 #density of material
-E = 1.3*10.0**10 #Young's modulus
+E = 1.3*10**10 #Young's modulus
 I = (w*d**3.0)/12.0 #inertia around the center of mass
 m = density*w*d #mass per meter of beam
 f = m*g #downward force per meter of beam
 p = 100.0 #kg/m
+mp = 50 #mass of the person on the end
+fl = 0.3 #lenght of foot of person
 constant = f/(24 * E * I);
 emach = np.finfo(float).eps;#1/2**(52);
 
@@ -39,7 +41,7 @@ def getB(n):
 
     return b
 
-def getBextraWeight(n):
+def getB6(n):
     h = L/n
     b = getB(n)
 
@@ -48,12 +50,22 @@ def getBextraWeight(n):
         
     return b
 
+
+def getB7(n):
+    h = L / n
+    b = getB(n)
+
+    for x in range(n):
+
+        if (L - h*n <= fl):
+            b[x] -= ((h) ** 4 / (E * I)) * g * mp/fl
+    return b
+
 def getY(x):
     return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2)
 
-def getYextraWeight(x):
+def getY6(x):
     return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2) - ((g*p*L)/(E*I*math.pi))*((L**3/math.pi**3)*math.sin(math.pi*x/L) - x**3/6 + L*x**2/2 - L**2*x/math.pi**2)
-
 
 def oppg5(i):
     out = []
@@ -65,7 +77,7 @@ def oppg5(i):
         b = getB(n)
         
         y = getY(L) - spsolve(A, b)[-1]
-        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "y" : y, "h" : L/n})
+        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "yDiff" : y, "h" : L/n})
 
     return out
 
@@ -76,9 +88,23 @@ def oppg6b(i):
         n = 10 << i
         
         A = makeStructureMatrix(n)
-        b = getBextraWeight(n)
-        y = getYextraWeight(L) - spsolve(A, b)[-1]
-        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "y" : y, "h" : L/n})
+        b = getB6(n)
+        y = getY6(L) - spsolve(A, b)[-1]
+        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "yDiff" : y, "h" : L/n})
+
+    return out
+
+
+def oppg7(i):
+    out = []
+
+    for i in range(i):
+        n = 10 << i
+
+        A = makeStructureMatrix(n)
+        b = getB7(n)
+        y = spsolve(A, b)#[-1]
+        out.append({"n": n, "kondis": kondisjonstall(A.toarray()), "y": y, "h": L / n})
 
     return out
 
@@ -136,12 +162,12 @@ arrayY5 = []
 arrayX5 = []
 for e in oppg5data:
     arrayX5.append(e["h"])
-    arrayY5.append(e["y"])
+    arrayY5.append(e["yDiff"])
 arrayY6 = []
 arrayX6 = []
 for e in oppg6data:
     arrayX6.append(e["h"])
-    arrayY6.append(e["y"])
+    arrayY6.append(e["yDiff"])
 
 pl.subplot(211)
 pl.yscale('log')
@@ -177,3 +203,18 @@ pl.show()
 
 print("Oppg. 7")
 
+oppg7data = oppg7(7)
+#for e in oppg7data:
+    #print(e)
+
+y7 = []
+x7 = []
+for i in range(oppg7data[6]["n"]):
+    x7.append(oppg7data[6]["h"]*i)
+y7 = oppg7data[6]["y"]
+
+#pl.xlim(-0.1, 2.1)
+pl.ylim(-1.0, 1.0)
+pl.gca().set_aspect('equal', adjustable='box')
+pl.plot(x7, -y7)
+pl.show()

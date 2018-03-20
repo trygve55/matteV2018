@@ -142,26 +142,21 @@ pl.plot(arrayX6, np.fabs(arrayY6))
 pl.show()
 
 print("Oppg. 6d")
-for e in oppg5data:
-    arrayX5.append(e["h"]**2)
-    arrayY5.append(e["kondis"] * np.finfo(float).eps)
-arrayY6 = []
-arrayX6 = []
-for e in oppg6data:
-    arrayX6.append(e["h"])
-    arrayY6.append(e["y"])
 
-pl.subplot(211)
+arrayYKondEps = []
+arrayYerror = []
+for e in oppg5data:
+    arrayYerror.append(L**2/e["n"]**2)
+    arrayYKondEps.append(e["kondis"] * np.finfo(float).eps)
+    
+pl.subplot(111)
 pl.yscale('log')
 pl.xscale('log')
 pl.ylabel("kondisjon")
-pl.plot(arrayY5)
-pl.subplot(212)
-pl.yscale('log')
-pl.xscale('log')
-pl.xlabel("h")
-pl.ylabel("Feil")
-pl.plot(arrayX6, np.fabs(arrayY6))
+pl.ylabel("h")
+pl.plot(arrayX5,arrayYerror)
+pl.plot(arrayX5,arrayYKondEps)
+pl.plot(arrayX5, np.fabs(arrayY5))
 pl.show()
 
 print("Oppg. 7")

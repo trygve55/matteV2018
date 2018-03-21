@@ -6,7 +6,6 @@ from scipy.sparse.linalg import spsolve
 import numpy as np
 from numpy import linalg
 import math
-import matplotlib.pyplot as pl
 
 g = -9.81 #gravity constant earth (negative)
 L = 2.0 #length
@@ -147,75 +146,3 @@ print("4.e. Differanse: ", y - y_e, "\n");
 print("4.e. Fram. feil: ", linalg.norm((y - y_e), 1), "\n"); # feilen er for å finne y!
 print("4.e. Maskin epsilon: ", emach);
 n = m;
-
-print("Oppg. 5")
-oppg5data = oppg5(9)
-for e in oppg5data:
-    print(e)
-
-print("Oppg. 6b")
-oppg6data = oppg6b(9)
-for e in oppg6data:
-    print(e)
-
-print("Oppg. 6c")
-arrayY5 = []
-arrayX5 = []
-for e in oppg5data:
-    arrayX5.append(e["h"])
-    arrayY5.append(e["yDiff"])
-arrayY6 = []
-arrayX6 = []
-for e in oppg6data:
-    arrayX6.append(e["h"])
-    arrayY6.append(e["yDiff"])
-
-pl.subplot(211)
-pl.yscale('log')
-pl.xscale('log')
-pl.xlabel("h")
-pl.ylabel("Feil")
-pl.plot(arrayX5, np.fabs(arrayY5))
-pl.subplot(212)
-pl.yscale('log')
-pl.xscale('log')
-pl.xlabel("h")
-pl.ylabel("Feil")
-pl.plot(arrayX6, np.fabs(arrayY6))
-pl.show()
-
-print("Oppg. 6d")
-
-arrayYKondEps = []
-arrayYerror = []
-for e in oppg5data:
-    arrayYerror.append(L**2/e["n"]**2)
-    arrayYKondEps.append(e["kondis"] * np.finfo(float).eps)
-    
-pl.subplot(111)
-pl.yscale('log')
-pl.xscale('log')
-pl.ylabel("kondisjon")
-pl.ylabel("h")
-pl.plot(arrayX5,arrayYerror)
-pl.plot(arrayX5,arrayYKondEps)
-pl.plot(arrayX5, np.fabs(arrayY5))
-pl.show()
-
-print("Oppg. 7")
-
-oppg7data = oppg7(7)
-#for e in oppg7data:
-    #print(e)
-
-y7 = []
-x7 = []
-for i in range(oppg7data[6]["n"]):
-    x7.append(oppg7data[6]["h"]*i)
-y7 = oppg7data[6]["y"]
-
-#pl.xlim(-0.1, 2.1)
-pl.ylim(-1.0, 1.0)
-pl.gca().set_aspect('equal', adjustable='box')
-pl.plot(x7, -y7)
-pl.show()

@@ -51,7 +51,7 @@ def getB6(n):
     b = getB(n)
 
     for x in range(n):
-        b[x] -= (c0 * np.sin((x + 1)*c1))/EI #p*g*math.sin((x*h + h/2)*math.pi/L)
+        b[x] += (c0 * np.sin((x + 1)*c1))/EI #p*g*math.sin((x*h + h/2)*math.pi/L)
         
     return b
 
@@ -63,14 +63,14 @@ def getB7(n):
 
     for x in range(n):
         if (L - h*(x+1) <= fl):
-            b[x] -= c;
+            b[x] += c;
     return b
 
 def getY(x):
     return constantEI * x * x * (x * (x - 4*L) + 6 * LL)
 
 def getY6(x):
-    return constantEI * x * x * (x * (x - 4*L) + 6 * LL) - (gp*L)/(EI*math.pi)*(LL*(L*math.sin(math.pi*x/L) - math.pi)/(math.pi*math.pi*math.pi) - x*(x*(x + 3*L)/6))
+    return constantEI * x * x * (x * (x - 4*L) + 6 * LL) + (gp*L)/(EI*math.pi)*(LL*(L*math.sin(math.pi*x/L) - math.pi)/(math.pi*math.pi*math.pi) - x*(x*(x + 3*L)/6))
 
 def oppg5(i):
     out = []

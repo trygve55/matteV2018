@@ -47,7 +47,7 @@ def getB(n):
 
 def getB6(n):
     c0 = (L/n)**4 * gp;
-    c1 = n*math.pi
+    c1 = math.pi/n
     b = getB(n)
 
     for x in range(n):
@@ -67,10 +67,10 @@ def getB7(n):
     return b
 
 def getY(x):
-    return (constantEI * x * x * (x * (x - 4*L) + 6 * LL)
+    return constantEI * x * x * (x * (x - 4*L) + 6 * LL)
 
 def getY6(x):
-    return (constantEI * x * x * (x * (x - 4*L) + 6 * LL) - (gp*L)/(EI*math.pi)*(LL*(L*math.sin(math.pi*x/L) - math.pi)/(math.pi*math.pi*math.pi) - x*(x*(x + 3*L)/6))
+    return constantEI * x * x * (x * (x - 4*L) + 6 * LL) - (gp*L)/(EI*math.pi)*(LL*(L*math.sin(math.pi*x/L) - math.pi)/(math.pi*math.pi*math.pi) - x*(x*(x + 3*L)/6))
 
 def oppg5(i):
     out = []
@@ -136,7 +136,7 @@ y_e = np.array([getY(i/n) for i in range(2, 21, 2)]);
 print("4.c. y_e: ", y_e, "\n");
 A_y = np.matmul(A.toarray(), y_e)*10000 / (LL*LL);
 print("4.c. Derivert: ", A_y, "\n");
-vector = np.array([constant * 24] * n);
+vector = np.array([constantEI * 24] * n);
 print("4.d. f/(EI): ", vector, "\n");
 print("4.d. Differanse: ", A_y - vector, "\n");
 forward = linalg.norm(vector - A_y, np.inf);# Dette er feilen for den fjedederiverte.

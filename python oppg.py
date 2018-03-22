@@ -7,6 +7,7 @@ import numpy as np
 from numpy import linalg
 import math
 import matplotlib.pyplot as pl
+import time
 
 g = -9.81 #gravity constant earth (negative)
 L = 2.0 #length
@@ -56,7 +57,7 @@ def getB7(n):
     b = getB(n)
 
     for x in range(n):
-        if (L - h*x <= fl):
+        if (L - h*(x+1) <= fl):
             b[x] -= ((h) ** 4 / (E * I)) * g * mp/fl
     return b
 
@@ -146,10 +147,21 @@ print("4.e. Fram. feil: ", linalg.norm((y - y_e), 1), "\n"); # feilen er for å 
 print("4.e. Maskin epsilon: ", emach);
 n = m;
 
+#utregninger for oppg 5, 6, 7
+startTime = time.time()
+oppg5data = oppg5(12)
+print("Oppg 5 tid: ", time.time()-startTime, "s")
+startTime = time.time()
+oppg6data = oppg6b(12)
+print("Oppg 6 tid: ", time.time()-startTime, "s")
+startTime = time.time()
+oppg7data = oppg7(8)
+print("Oppg 7 tid: ", time.time()-startTime, "s")
+startTime = time.time()
+
 print("Oppg. 5")
 arrayY5 = []
 arrayX5 = []
-oppg5data = oppg5(10)
 for e in oppg5data:
     print(e)
     arrayX5.append(e["h"])
@@ -166,7 +178,6 @@ pl.show()
 
 
 print("Oppg. 6b")
-oppg6data = oppg6b(10)
 for e in oppg6data:
     print(e)
 
@@ -212,11 +223,16 @@ pl.show()
 
 
 print("Oppg. 6f")
-print("Den optimale verdien av n er 5120, fordi dette gir lavest feil. Dette er fordi h^4 blir nære marskinepsilon og derfor blir mer unøyaktig etter dette punktet")
+lowYDiff = np.infty
+lowYDiffN = 1
+for e in oppg6data:
+    if (np.fabs(e["yDiff"]) < lowYDiff):
+        lowYDiff = np.fabs(e["yDiff"])
+        lowYDiffN = e["n"]
+print("Den optimale verdien av n er " + str(lowYDiffN) + ", fordi dette gir lavest feil. Dette er fordi h^4 blir nære marskinepsilon og derfor blir mer unøyaktig etter dette punktet(feil?)")
 
 print("Oppg. 7")
 
-oppg7data = oppg7(9)
 #for e in oppg7data:
     #print(e)
 print("Stupebrettet bøyes ned " + str(oppg7data[3]["y"][-1]) + " m.")

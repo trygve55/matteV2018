@@ -151,10 +151,10 @@ n = m;
 
 #utregninger for oppg 5, 6, 7
 startTime = time.time()
-oppg5data = oppg5(10)
+oppg5data = oppg5(12)
 print("Oppg 5 tid: ", time.time()-startTime, "s")
 startTime = time.time()
-oppg6data = oppg6b(10)
+oppg6data = oppg6b(12)
 print("Oppg 6 tid: ", time.time()-startTime, "s")
 startTime = time.time()
 oppg7data = oppg7(8)

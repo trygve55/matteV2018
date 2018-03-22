@@ -46,7 +46,7 @@ def getB6(n):
     b = getB(n)
 
     for x in range(n):
-        b[x] -= ((h)**4 /(E * I)) * p*g*np.sin((x*h)*math.pi/L) #p*g*math.sin((x*h + h/2)*math.pi/L)
+        b[x] -= ((h)**4 /(E * I)) * p*g*np.sin((x*h + h)*math.pi/L) #p*g*math.sin((x*h + h/2)*math.pi/L)
         
     return b
 
@@ -159,8 +159,10 @@ pl.yscale('log')
 pl.xscale('log')
 pl.xlabel("h")
 pl.ylabel("Feil")
+pl.title("Oppg. 5")
 pl.plot(arrayX5, np.fabs(arrayY5), label="y feil")
 pl.legend()
+pl.show()
 
 
 print("Oppg. 6b")

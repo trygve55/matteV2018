@@ -10,18 +10,21 @@ import matplotlib.pyplot as pl
 import time
 
 g = -9.81 #gravity constant earth (negative)
-L = 2.0 #length
-w = 0.30 #width
-d = 0.030 #depth
-density = 480.0 #density of material
+L = 2. #length
+w = 0.3 #width
+d = 0.03 #depth
+density = 480. #density of material
 E = 1.3*10**10 #Young's modulus
-I = (w*d**3.0)/12.0 #inertia around the center of mass
+I = (w*d**3.)/12. #inertia around the center of mass
 m = density*w*d #mass per meter of beam
 f = m*g #downward force per meter of beam
-p = 100.0 #kg/m
+p = 100. #kg/m
 mp = 50 #mass of the person on the end
 fl = 0.3 #lenght of foot of person
-constant = f/(24 * E * I);
+EI = E * I;
+gp = p * g;
+LL = L * L;
+constantEI = f/(24 * EI);
 emach = np.finfo(float).eps;#1/2**(52);
 
 def makeStructureMatrix(n):
@@ -38,34 +41,36 @@ def makeStructureMatrix(n):
     return csr_matrix(A)
 
 def getB(n):
-    b = sp.array([((L/n)**4 /(E * I)) * f] * n)
+    b = sp.array([((L/n)**4 * f)/EI] * n)
 
     return b
 
 def getB6(n):
-    h = L/n
+    c0 = (L/n)**4 * gp;
+    c1 = math.pi/n
     b = getB(n)
 
     for x in range(n):
-        b[x] += ((h)**4 /(E * I)) * p*g*np.sin((x*h + h)*math.pi/L) #p*g*math.sin((x*h + h/2)*math.pi/L)
+        b[x] += (c0 * np.sin((x + 1)*c1))/EI #p*g*math.sin((x*h + h/2)*math.pi/L)
         
     return b
 
 
 def getB7(n):
     h = L / n
+    c = (g * mp * h**4)/(fl * EI);
     b = getB(n)
 
     for x in range(n):
         if (L - h*(x+1) <= fl):
-            b[x] += ((h) ** 4 / (E * I)) * g * mp/fl
+            b[x] += c;
     return b
 
 def getY(x):
-    return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2)
+    return constantEI * x * x * (x * (x - 4*L) + 6 * LL)
 
 def getY6(x):
-    return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2) + ((g*p*L)/(E*I*math.pi))*((L**3/math.pi**3)*math.sin(math.pi*x/L) - x**3/6 + L*x**2/2 - L**2*x/math.pi**2)
+    return constantEI * x * x * (x * (x - 4*L) + 6 * LL) + (gp*L)/(EI*math.pi)*(LL*(L*math.sin(math.pi*x/L) - math.pi)/(math.pi*math.pi*math.pi) - x*(x*(x + 3*L)/6))
 
 def oppg5(i):
     out = []
@@ -75,9 +80,9 @@ def oppg5(i):
         
         A = makeStructureMatrix(n)
         b = getB(n)
-        y = spsolve(A, b)[-1]
-        yDiff = getY(L) - y
-        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()),"y" : y , "yDiff" : yDiff, "h" : L/n})
+        
+        y = getY(L) - spsolve(A, b)[-1]
+        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "yDiff" : y, "h" : L/n})
 
     return out
 
@@ -111,9 +116,7 @@ def oppg7(i):
 
 
 def kondisjonstall(A):
-    return linalg.norm(A,np.inf)*linalg.norm(linalg.inv(A),np.inf);
-
-print(getB7(20))
+    return linalg.norm(A, np.inf)*linalg.norm(linalg.inv(A), np.inf);
 
 n = 10
 A = makeStructureMatrix(n)
@@ -131,9 +134,9 @@ m = n;
 n = 10;
 y_e = np.array([getY(i/n) for i in range(2, 21, 2)]);
 print("4.c. y_e: ", y_e, "\n");
-A_y = np.matmul(A.toarray(), y_e)*(10000/(L**4));# SPØRRE RIVTZ OM DETTE
+A_y = np.matmul(A.toarray(), y_e)*10000 / (LL*LL);
 print("4.c. Derivert: ", A_y, "\n");
-vector = np.array([f/(E * I)] * n);
+vector = np.array([constantEI * 24] * n);
 print("4.d. f/(EI): ", vector, "\n");
 print("4.d. Differanse: ", A_y - vector, "\n");
 forward = linalg.norm(vector - A_y, np.inf);# Dette er feilen for den fjedederiverte.
@@ -151,10 +154,10 @@ n = m;
 
 #utregninger for oppg 5, 6, 7
 startTime = time.time()
-oppg5data = oppg5(10)
+oppg5data = oppg5(12)
 print("Oppg 5 tid: ", time.time()-startTime, "s")
 startTime = time.time()
-oppg6data = oppg6b(10)
+oppg6data = oppg6b(12)
 print("Oppg 6 tid: ", time.time()-startTime, "s")
 startTime = time.time()
 oppg7data = oppg7(8)
@@ -214,7 +217,7 @@ print("Oppg. 6d")
 arrayYKondEps = []
 arrayYerror = []
 for e in oppg5data:
-    arrayYerror.append(L**2/e["n"]**2)
+    arrayYerror.append(LL/e["n"]**2)
     arrayYKondEps.append(e["kondis"] * np.finfo(float).eps)
     
 pl.subplot(111)
@@ -243,7 +246,7 @@ print("Oppg. 7")
 
 #for e in oppg7data:
     #print(e)
-print("Stupebrettet bøyes ned " + str(-oppg7data[3]["y"][-1]) + " m.")
+print("Stupebrettet bøyes ned " + str(oppg7data[3]["y"][-1]) + " m.")
 
 y7 = []
 x7 = []
@@ -254,7 +257,7 @@ y7 = oppg7data[6]["y"]
 #pl.xlim(-0.1, 2.1)
 pl.ylim(-1.0, 1.0)
 pl.gca().set_aspect('equal', adjustable='box')
-pl.plot(x7, y7, label='Stupebrett')
+pl.plot(x7, -y7, label='Stupebrett')
 pl.title('Oppg. 7')
 pl.legend()
 pl.show()

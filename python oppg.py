@@ -134,7 +134,7 @@ print("4.c. Derivert: ", A_y, "\n");
 vector = np.array([f/(E * I)] * n);
 print("4.d. f/(EI): ", vector, "\n");
 print("4.d. Differanse: ", A_y - vector, "\n");
-forward = linalg.norm(vector - A_y, np.inf);# Dette er feilen for den fjedederivert.
+forward = linalg.norm(vector - A_y, np.inf);# Dette er feilen for den fjedederiverte.
 print("4.d. Fram. feil: ", forward, "\n");
 rel = forward/linalg.norm(vector, np.inf);
 print("4.d. Rel. Fram. feil: ", rel, "\n");

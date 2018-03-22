@@ -89,8 +89,9 @@ def oppg6b(i):
         
         A = makeStructureMatrix(n)
         b = getB6(n)
-        y = getY6(L) - spsolve(A, b)[-1]
-        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "yDiff" : y, "h" : L/n})
+        y = spsolve(A, b)[-1]
+        yDiff = getY6(L) - y
+        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()),"y" : y, "yDiff" : yDiff, "h" : L/n})
 
     return out
 
@@ -111,7 +112,6 @@ def oppg7(i):
 
 def kondisjonstall(A):
     return linalg.norm(A,1)*linalg.norm(linalg.inv(A),1);
-
 
 n = 10
 A = makeStructureMatrix(n)
@@ -178,23 +178,29 @@ pl.show()
 
 
 print("Oppg. 6b")
-for e in oppg6data:
-    print(e)
-
-print("Oppg. 6c")
 arrayY6 = []
 arrayX6 = []
+arrayY6y = []
 for e in oppg6data:
-    arrayX6.append(e["h"])
+    print(e)
+    arrayX6.append(e["n"])
     arrayY6.append(e["yDiff"])
+    arrayY6y.append(e["y"])
 
-'''
-pl.subplot(211)
+pl.xlabel("n")
+pl.ylabel("y")
+pl.xscale("log")
+pl.title("Oppg. 6b")
+pl.plot(arrayX6, np.fabs(arrayY6y), label="y")
+pl.plot(arrayX6, np.fabs([getY6(L)]*arrayX6.__len__()), label="y eksakt")
+pl.legend()
+pl.show()
 
-pl.subplot(212)'''
+print("Oppg. 6c")
+
 pl.yscale('log')
 pl.xscale('log')
-pl.xlabel("h")
+pl.xlabel("n")
 pl.ylabel("Feil")
 pl.title("Oppg. 6c")
 pl.plot(arrayX6, np.fabs(arrayY6), label="y feil")
@@ -212,12 +218,12 @@ for e in oppg5data:
 pl.subplot(111)
 pl.yscale('log')
 pl.xscale('log')
-pl.ylabel("kondisjon")
-pl.ylabel("h")
+pl.ylabel("Verdi")
+pl.xlabel("h")
 pl.title("Oppg. 6d")
 pl.plot(arrayX5,arrayYerror, label="L^2/n^2")
 pl.plot(arrayX5,arrayYKondEps, label="C * machine epsilon")
-pl.plot(arrayX5, np.fabs(arrayY6), label="feil")
+pl.plot(arrayX5, np.fabs(arrayY6), label="feil 6c")
 pl.legend()
 pl.show()
 

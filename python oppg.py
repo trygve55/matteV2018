@@ -47,7 +47,7 @@ def getB6(n):
     b = getB(n)
 
     for x in range(n):
-        b[x] -= ((h)**4 /(E * I)) * p*g*np.sin((x*h + h)*math.pi/L) #p*g*math.sin((x*h + h/2)*math.pi/L)
+        b[x] += ((h)**4 /(E * I)) * p*g*np.sin((x*h + h)*math.pi/L) #p*g*math.sin((x*h + h/2)*math.pi/L)
         
     return b
 
@@ -58,14 +58,14 @@ def getB7(n):
 
     for x in range(n):
         if (L - h*(x+1) <= fl):
-            b[x] -= ((h) ** 4 / (E * I)) * g * mp/fl
+            b[x] += ((h) ** 4 / (E * I)) * g * mp/fl
     return b
 
 def getY(x):
     return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2)
 
 def getY6(x):
-    return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2) - ((g*p*L)/(E*I*math.pi))*((L**3/math.pi**3)*math.sin(math.pi*x/L) - x**3/6 + L*x**2/2 - L**2*x/math.pi**2)
+    return (f/(24*E*I))*x**2*(x**2 - 4*L*x + 6 * L**2) + ((g*p*L)/(E*I*math.pi))*((L**3/math.pi**3)*math.sin(math.pi*x/L) - x**3/6 + L*x**2/2 - L**2*x/math.pi**2)
 
 def oppg5(i):
     out = []
@@ -75,9 +75,9 @@ def oppg5(i):
         
         A = makeStructureMatrix(n)
         b = getB(n)
-        
-        y = getY(L) - spsolve(A, b)[-1]
-        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()), "yDiff" : y, "h" : L/n})
+        y = spsolve(A, b)[-1]
+        yDiff = getY(L) - y
+        out.append({"n" : n,"kondis" : kondisjonstall(A.toarray()),"y" : y , "yDiff" : yDiff, "h" : L/n})
 
     return out
 
@@ -111,7 +111,9 @@ def oppg7(i):
 
 
 def kondisjonstall(A):
-    return linalg.norm(A,1)*linalg.norm(linalg.inv(A),1);
+    return linalg.norm(A,np.inf)*linalg.norm(linalg.inv(A),np.inf);
+
+print(getB7(20))
 
 n = 10
 A = makeStructureMatrix(n)
@@ -149,10 +151,10 @@ n = m;
 
 #utregninger for oppg 5, 6, 7
 startTime = time.time()
-oppg5data = oppg5(12)
+oppg5data = oppg5(10)
 print("Oppg 5 tid: ", time.time()-startTime, "s")
 startTime = time.time()
-oppg6data = oppg6b(12)
+oppg6data = oppg6b(10)
 print("Oppg 6 tid: ", time.time()-startTime, "s")
 startTime = time.time()
 oppg7data = oppg7(8)
@@ -241,7 +243,7 @@ print("Oppg. 7")
 
 #for e in oppg7data:
     #print(e)
-print("Stupebrettet bøyes ned " + str(oppg7data[3]["y"][-1]) + " m.")
+print("Stupebrettet bøyes ned " + str(-oppg7data[3]["y"][-1]) + " m.")
 
 y7 = []
 x7 = []
@@ -252,7 +254,7 @@ y7 = oppg7data[6]["y"]
 #pl.xlim(-0.1, 2.1)
 pl.ylim(-1.0, 1.0)
 pl.gca().set_aspect('equal', adjustable='box')
-pl.plot(x7, -y7, label='Stupebrett')
+pl.plot(x7, y7, label='Stupebrett')
 pl.title('Oppg. 7')
 pl.legend()
 pl.show()
